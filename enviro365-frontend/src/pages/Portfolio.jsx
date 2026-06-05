@@ -1,9 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { fetchPortfolio } from '../api/investorApi';
+import React from 'react';
+import usePortfolio from '../hooks/usePortfolio';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ErrorBanner    from '../components/shared/ErrorBanner';
 
-// Matches badge styling from Stitch design
+function formatZAR(value) {
+  return 'R ' + Number(value).toLocaleString('en-ZA', {
+    minimumFractionDigits: 2, maximumFractionDigits: 2,
+  });
+}
+
 function ProductTypeBadge({ type }) {
   const styles = {
     SAVINGS:    'bg-primary-fixed text-on-primary-fixed-variant',
@@ -18,30 +23,13 @@ function ProductTypeBadge({ type }) {
   );
 }
 
-function formatZAR(value) {
-  return 'R ' + Number(value).toLocaleString('en-ZA', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
-
 export default function Portfolio({ onSelectProduct }) {
-  const [investor, setInvestor] = useState(null);
-  const [loading,  setLoading]  = useState(true);
-  const [error,    setError]    = useState(null);
-
-  useEffect(() => {
-    fetchPortfolio()
-      .then(setInvestor)
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
-  }, []);
+  const { investor, loading, error } = usePortfolio();
 
   if (loading) return <LoadingSpinner message="Loading portfolio..." />;
 
   return (
     <div>
-      {/* Page heading */}
       <div className="mb-stack-lg">
         <h1 className="font-headline-xl text-headline-xl text-primary mb-stack-sm hidden md:block">Portfolio Overview</h1>
         <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-stack-sm md:hidden">Portfolio</h1>
@@ -51,7 +39,6 @@ export default function Portfolio({ onSelectProduct }) {
 
       {investor && (
         <>
-          {/* Investor summary card — straight from Stitch design */}
           <section className="bg-surface-container-low p-stack-md rounded-lg flat-border mb-stack-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-stack-md">
             <div className="flex items-center gap-stack-md">
               <div className="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-on-primary">
@@ -76,7 +63,6 @@ export default function Portfolio({ onSelectProduct }) {
             </div>
           </section>
 
-          {/* Product list */}
           <section className="space-y-stack-md">
             <div className="flex justify-between items-end mb-stack-sm">
               <h3 className="font-headline-md text-headline-md text-primary">Active Products</h3>
@@ -86,21 +72,15 @@ export default function Portfolio({ onSelectProduct }) {
             </div>
 
             {investor.products.map(product => (
-              <div
-                key={product.productId}
-                className="bg-surface p-stack-md rounded-lg flat-border flex flex-col md:flex-row justify-between items-start md:items-center gap-stack-md hover:bg-surface-container-low transition-colors duration-200"
-              >
+              <div key={product.productId} className="bg-surface p-stack-md rounded-lg flat-border flex flex-col md:flex-row justify-between items-start md:items-center gap-stack-md hover:bg-surface-container-low transition-colors duration-200">
                 <div className="flex flex-col gap-stack-xs">
                   <ProductTypeBadge type={product.productType} />
                   <h4 className="font-headline-md text-headline-md text-primary">{product.productName}</h4>
                 </div>
-
                 <div className="flex flex-col md:items-end w-full md:w-auto gap-stack-sm">
                   <div>
                     <p className="font-label-caps text-label-caps text-on-surface-variant">CURRENT BALANCE</p>
-                    <p className="font-headline-md text-headline-md text-primary font-bold">
-                      {formatZAR(product.balance)}
-                    </p>
+                    <p className="font-headline-md text-headline-md text-primary font-bold">{formatZAR(product.balance)}</p>
                   </div>
                   <button
                     onClick={() => onSelectProduct(product)}

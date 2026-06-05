@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { fetchWithdrawalHistory, downloadCsv } from '../api/investorApi';
+import React from 'react';
+import useHistory     from '../hooks/useHistory';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ErrorBanner    from '../components/shared/ErrorBanner';
 
 function formatZAR(value) {
   return 'R ' + Number(value).toLocaleString('en-ZA', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 2, maximumFractionDigits: 2,
   });
 }
 
@@ -32,32 +31,19 @@ function ProductTypeBadge({ type }) {
 }
 
 export default function History() {
-  const [withdrawals, setWithdrawals] = useState([]);
-  const [loading,     setLoading]     = useState(true);
-  const [error,       setError]       = useState(null);
-
-  useEffect(() => {
-    fetchWithdrawalHistory()
-      .then(setWithdrawals)
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
-  }, []);
+  const { withdrawals, loading, error, handleDownloadCsv } = useHistory();
 
   if (loading) return <LoadingSpinner message="Loading history..." />;
 
   return (
     <div className="max-w-5xl mx-auto">
-
-      {/* Page header + CSV button */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-stack-lg gap-stack-sm">
         <div>
           <h1 className="font-headline-xl text-headline-xl text-primary mb-2">Withdrawal History</h1>
-          <p className="text-on-surface-variant font-body-md">
-            Review your recent transaction history and export statements.
-          </p>
+          <p className="text-on-surface-variant font-body-md">Review your recent transaction history and export statements.</p>
         </div>
         <button
-          onClick={downloadCsv}
+          onClick={handleDownloadCsv}
           className="flex items-center gap-base border-2 border-primary text-primary px-stack-md py-stack-sm font-label-caps text-label-caps uppercase hover:bg-primary hover:text-on-primary transition-all duration-300"
         >
           <span className="material-symbols-outlined">download</span>
@@ -88,21 +74,11 @@ export default function History() {
               <tbody className="divide-y divide-outline-variant">
                 {withdrawals.map(w => (
                   <tr key={w.id} className="hover:bg-surface-container-low transition-colors">
-                    <td className="px-stack-md py-stack-sm font-data-mono text-data-mono text-on-surface">
-                      {formatDate(w.createdAt)}
-                    </td>
-                    <td className="px-stack-md py-stack-sm font-body-md text-body-md font-semibold text-primary">
-                      {w.productName}
-                    </td>
-                    <td className="px-stack-md py-stack-sm">
-                      <ProductTypeBadge type={w.productType} />
-                    </td>
-                    <td className="px-stack-md py-stack-sm font-data-mono text-data-mono text-error text-right">
-                      {formatZAR(w.amount)}
-                    </td>
-                    <td className="px-stack-md py-stack-sm font-data-mono text-data-mono text-on-surface text-right">
-                      {formatZAR(w.balanceAfterWithdrawal)}
-                    </td>
+                    <td className="px-stack-md py-stack-sm font-data-mono text-data-mono text-on-surface">{formatDate(w.createdAt)}</td>
+                    <td className="px-stack-md py-stack-sm font-body-md text-body-md font-semibold text-primary">{w.productName}</td>
+                    <td className="px-stack-md py-stack-sm"><ProductTypeBadge type={w.productType} /></td>
+                    <td className="px-stack-md py-stack-sm font-data-mono text-data-mono text-error text-right">{formatZAR(w.amount)}</td>
+                    <td className="px-stack-md py-stack-sm font-data-mono text-data-mono text-on-surface text-right">{formatZAR(w.balanceAfterWithdrawal)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -111,12 +87,10 @@ export default function History() {
         </div>
       )}
 
-      {/* Info note — from Stitch history screen */}
       <div className="mt-stack-md p-stack-md bg-surface-container-low border border-outline-variant flex items-start gap-stack-sm">
         <span className="material-symbols-outlined text-primary">info</span>
         <p className="font-body-sm text-body-sm text-on-surface-variant">
-          Withdrawals are typically processed within 2–3 business days. If you have questions
-          regarding a specific transaction, please contact your account manager.
+          Withdrawals are typically processed within 2–3 business days. Contact your account manager for transaction queries.
         </p>
       </div>
     </div>
