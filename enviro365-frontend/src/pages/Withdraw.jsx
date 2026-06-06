@@ -1,12 +1,8 @@
 import React from 'react';
 import useWithdraw    from '../hooks/useWithdraw';
 import ErrorBanner    from '../components/shared/ErrorBanner';
+import { formatZAR } from '../utils/formatter';
 
-function formatZAR(value) {
-  return 'R ' + Number(value).toLocaleString('en-ZA', {
-    minimumFractionDigits: 2, maximumFractionDigits: 2,
-  });
-}
 
 export default function Withdraw({ selectedProduct }) {
   const {

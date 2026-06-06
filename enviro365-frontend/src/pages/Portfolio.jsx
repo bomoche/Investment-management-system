@@ -2,12 +2,8 @@ import React from 'react';
 import usePortfolio from '../hooks/usePortfolio';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ErrorBanner    from '../components/shared/ErrorBanner';
+import { formatZAR } from '../utils/formatter';
 
-function formatZAR(value) {
-  return 'R ' + Number(value).toLocaleString('en-ZA', {
-    minimumFractionDigits: 2, maximumFractionDigits: 2,
-  });
-}
 
 function ProductTypeBadge({ type }) {
   const styles = {
