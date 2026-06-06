@@ -2,19 +2,8 @@ import React from 'react';
 import useHistory     from '../hooks/useHistory';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ErrorBanner    from '../components/shared/ErrorBanner';
+import { formatDate, formatZAR } from '../utils/formatter';
 
-function formatZAR(value) {
-  return 'R ' + Number(value).toLocaleString('en-ZA', {
-    minimumFractionDigits: 2, maximumFractionDigits: 2,
-  });
-}
-
-function formatDate(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-ZA', {
-    year: 'numeric', month: 'short', day: '2-digit',
-  });
-}
 
 function ProductTypeBadge({ type }) {
   const styles = {
