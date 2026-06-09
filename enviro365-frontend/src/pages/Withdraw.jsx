@@ -4,11 +4,11 @@ import ErrorBanner    from '../components/shared/ErrorBanner';
 import { formatZAR } from '../utils/formatter';
 
 
-export default function Withdraw({ selectedProduct }) {
+export default function Withdraw({ selectedProduct, onWithdrawSuccess }) {
   const {
     amount, amountError, apiError, success,
     loading, maxAllowed, handleAmountChange, handleSubmit,
-  } = useWithdraw(selectedProduct);
+  } = useWithdraw(selectedProduct, onWithdrawSuccess);
 
   if (!selectedProduct) {
     return (

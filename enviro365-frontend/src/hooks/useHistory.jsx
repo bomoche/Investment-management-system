@@ -8,7 +8,10 @@ export default function useHistory() {
 
   useEffect(() => {
     fetchWithdrawalHistory()
-      .then(setWithdrawals)
+      .then(data => {
+        console.log('History data:', data);
+        setWithdrawals(data);
+      })
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
