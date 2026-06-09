@@ -25,7 +25,7 @@ export default function History() {
   if (loading) return <LoadingSpinner message="Loading history..." />;
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto pb-28 md:pb-0">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-stack-lg gap-stack-sm">
         <div>
           <h1 className="font-headline-xl text-headline-xl text-primary mb-2">Withdrawal History</h1>
