@@ -28,7 +28,7 @@ function AppShell({ children }) {
       </div>
       <Footer />
       <BottomNav />
-      <div className="h-16 md:hidden" />
+      <div className="h-28 md:hidden" />
     </div>
   );
 }

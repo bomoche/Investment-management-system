@@ -25,7 +25,7 @@ export default function Portfolio({ onSelectProduct }) {
   if (loading) return <LoadingSpinner message="Loading portfolio..." />;
 
   return (
-    <div>
+    <div className="pb-28 md:pb-0">
       <div className="mb-stack-lg">
         <h1 className="font-headline-xl text-headline-xl text-primary mb-stack-sm hidden md:block">Portfolio Overview</h1>
         <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-stack-sm md:hidden">Portfolio</h1>
