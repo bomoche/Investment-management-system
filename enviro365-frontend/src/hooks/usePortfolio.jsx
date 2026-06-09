@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchPortfolio } from '../api/investorApi';
 
 export default function usePortfolio() {
@@ -6,12 +6,15 @@ export default function usePortfolio() {
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState(null);
 
-  useEffect(() => {
+  const load = useCallback(() => {
+    setLoading(true);
     fetchPortfolio()
       .then(setInvestor)
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
 
-  return { investor, loading, error };
+  useEffect(() => { load(); }, [load]);
+
+  return { investor, loading, error, refetch: load };
 }

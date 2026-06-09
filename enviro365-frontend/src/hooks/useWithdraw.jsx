@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { submitWithdrawal } from '../api/investorApi';
 
-export default function useWithdraw(selectedProduct) {
+export default function useWithdraw(selectedProduct, onSuccess) {
   const [amount,      setAmount]      = useState('');
   const [amountError, setAmountError] = useState(null);
   const [apiError,    setApiError]    = useState(null);
@@ -37,6 +37,8 @@ export default function useWithdraw(selectedProduct) {
       const result = await submitWithdrawal(selectedProduct.productId, parsed);
       setSuccess(result);
       setAmount('');
+      // Notify parent to refetch portfolio so balance updates
+      if (onSuccess) onSuccess();
     } catch (err) {
       setApiError(err.message);
     } finally {

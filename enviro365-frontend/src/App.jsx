@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { isAuthenticated } from './hooks/useAuth';
 import ROUTES    from './constants/routes';
 import TopBar    from './components/layout/TopBar';
@@ -12,12 +12,10 @@ import Portfolio from './pages/Portfolio';
 import Withdraw  from './pages/Withdraw';
 import History   from './pages/History';
 
-// Protects routes — redirects to login if not authenticated
 function ProtectedRoute({ children }) {
   return isAuthenticated() ? children : <Navigate to={ROUTES.LOGIN} replace />;
 }
 
-// Layout wrapper for authenticated pages
 function AppShell({ children }) {
   return (
     <div className="min-h-screen flex flex-col font-body-md">
@@ -35,43 +33,64 @@ function AppShell({ children }) {
   );
 }
 
-export default function App() {
+// Separate component so we can use useNavigate inside BrowserRouter
+function AppRoutes() {
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const navigate = useNavigate();
+  const [portfolioKey, setPortfolioKey] = useState(0);
+
+  function handleSelectProduct(product) {
+    setSelectedProduct(product);
+    navigate(ROUTES.WITHDRAW);
+  }
+
+  function handleWithdrawSuccess() {
+    setPortfolioKey(k => k + 1);
+  }
 
   return (
+    <Routes>
+      <Route path={ROUTES.LOGIN}  element={<Login />} />
+      <Route path={ROUTES.SIGNUP} element={<SignUp />} />
+
+      <Route path={ROUTES.PORTFOLIO} element={
+        <ProtectedRoute>
+          <AppShell>
+            <Portfolio 
+              key={portfolioKey}
+              onSelectProduct={handleSelectProduct} 
+            />
+          </AppShell>
+        </ProtectedRoute>
+      } />
+      <Route path={ROUTES.WITHDRAW} element={
+        <ProtectedRoute>
+          <AppShell>
+            <Withdraw 
+              selectedProduct={selectedProduct}
+              onWithdrawSuccess={handleWithdrawSuccess}
+            />
+          </AppShell>
+        </ProtectedRoute>
+      } />
+      <Route path={ROUTES.HISTORY} element={
+        <ProtectedRoute>
+          <AppShell>
+            <History />
+          </AppShell>
+        </ProtectedRoute>
+      } />
+
+      <Route index element={<Navigate to={ROUTES.LOGIN} replace />} />
+      <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  return (
     <BrowserRouter>
-      <Routes>
-        {/* Public routes */}
-        <Route path={ROUTES.LOGIN}  element={<Login />} />
-        <Route path={ROUTES.SIGNUP} element={<SignUp />} />
-
-        {/* Protected routes */}
-        <Route path={ROUTES.PORTFOLIO} element={
-          <ProtectedRoute>
-            <AppShell>
-              <Portfolio onSelectProduct={setSelectedProduct} />
-            </AppShell>
-          </ProtectedRoute>
-        } />
-        <Route path={ROUTES.WITHDRAW} element={
-          <ProtectedRoute>
-            <AppShell>
-              <Withdraw selectedProduct={selectedProduct} />
-            </AppShell>
-          </ProtectedRoute>
-        } />
-        <Route path={ROUTES.HISTORY} element={
-          <ProtectedRoute>
-            <AppShell>
-              <History />
-            </AppShell>
-          </ProtectedRoute>
-        } />
-
-        {/* Default redirect */}
-        <Route index element={<Navigate to={ROUTES.LOGIN} replace />} />
-        <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
-      </Routes>
+      <AppRoutes />
     </BrowserRouter>
   );
 }
